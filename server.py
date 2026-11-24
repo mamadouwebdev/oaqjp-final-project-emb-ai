@@ -13,9 +13,10 @@ def get_home_page():
 @app.get("/emotionDetector")
 def detect_emotion() -> dict:
     text = request.args.get("textToAnalyze")
-    if not text:
-        return "Oops! Invalid input. Please again"
-    return emotion_detector(text)
+    detection_result = emotion_detector(text)
+    if detection_result["dominant_emotion"] == None:
+        return "Invalid text! Please try again!"
+    return detection_result
 
 if __name__ == "__main__":
     app.run(port=5000)

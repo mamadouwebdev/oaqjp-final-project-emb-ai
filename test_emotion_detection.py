@@ -4,6 +4,10 @@ from EmotionDetection import emotion_detector
 
 
 class TestEmotionDetector(unittest.TestCase):
+    def test_cannot_detect_emotion_in_empty_text(self) -> None:
+        detection_result = emotion_detector("")
+        self.assertFalse(all((v for v in detection_result.values())))
+
     def test_can_detect_anger(self) -> None:
         self._test_emotion(
             emotion="anger",

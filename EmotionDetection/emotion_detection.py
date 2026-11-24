@@ -15,11 +15,20 @@ def emotion_detector(text_to_analyze: str) -> dict:
         json=data
     )
 
-    serialized_response: dict = json.loads(response.text)
-    emotions: dict[str, float] = serialized_response["emotionPredictions"][0]["emotion"]
+    emotions: dict[str, float|None] = {}
+    dominant_emotion: str = ""
 
-    emotions["dominant_emotion"]: str = next (
-        emotion for emotion, score in emotions.items()
-        if score == max(emotions.values())
-    )
-    return emotions
+    if response.status_code == 200:
+        serialized_response: dict = json.loads(response.text)
+        emotions = serialized_response["emotionPredictions"][0]["emotion"]
+        dominant_emotion = next (
+            emotion for emotion, score in emotions.items()
+            if score == max(emotions.values())
+        )
+    elif response.status_code == 400:
+        for k in ("anger", "fear", "disgust", "sadness", "joy"):
+            emotions[k] = None
+        dominant_emotion = None
+
+    detection_result = {**emotions, "dominant_emotion": dominant_emotion}
+    return detection_result
